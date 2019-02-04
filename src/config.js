@@ -1,1 +1,1 @@
-exports.url = 'http://35.204.169.34:4000';
+exports.url = 'http://localhost:4000';

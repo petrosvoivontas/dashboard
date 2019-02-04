@@ -2,6 +2,7 @@ import $ from 'jquery';
 import React, { Component } from 'react';
 import './App.css';
 const {url} = require('./config');
+const {googleSignup} = require('./firebase/auth');
 
 class App extends Component {
   constructor(props) {
@@ -47,16 +48,7 @@ class App extends Component {
   }
 
   handleGoogleSignup () {
-    const responseDisplay = $('.response');
-    fetch(`${url}/users/google`)
-      .then(response => {
-        if (response.ok) {
-          return response.json();
-        }
-      }, networkError => console.log(networkError))
-      .then(jsonResponse => {
-        responseDisplay.text(jsonResponse)
-      })
+    googleSignup();
   }
 
   render() {
