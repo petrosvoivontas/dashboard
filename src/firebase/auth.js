@@ -55,26 +55,30 @@ exports.googleSignup = () => auth.signInWithPopup(googleProvider)
         }
     })
 
-exports.facebookSignup = () => auth.signInWithPopup(facebookProvider)
-    .then(result => {
-        const token = result.credential.accessToken;
-        const user = result.user;
-        return {
-            token: token,
-            user: user
-        }
-    }).catch(error => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        const email = error.email;
-        const credential = error.credential;
-        return {
-            errorCode: errorCode,
-            errorMessage: errorMessage,
-            email: email,
-            credential: credential
-        }
+exports.facebookSignup = () => {
+    return new Promise((resolve, reject) => {
+        auth.signInWithPopup(facebookProvider)
+        .then(result => {
+            const token = result.credential.accessToken;
+            const user = result.user;
+            resolve({
+                token: token,
+                user: user
+            })
+        }).catch(error => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            const email = error.email;
+            const credential = error.credential;
+            resolve({
+                errorCode: errorCode,
+                errorMessage: errorMessage,
+                email: email,
+                credential: credential
+            })
+        })
     })
+}
 
 exports.getFacebookResult = () => auth.getRedirectResult()
     .then(result => {

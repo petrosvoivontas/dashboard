@@ -1,8 +1,7 @@
 import $ from 'jquery';
 import React, { Component } from 'react';
 import './App.css';
-const {url} = require('./config');
-const {googleSignup} = require('./firebase/auth');
+const {emailSignup, emailLogin, googleSignup, facebookSignup, getFacebookResult} = require('./firebase/auth');
 
 class App extends Component {
   constructor(props) {
@@ -16,39 +15,25 @@ class App extends Component {
   }
 
   handleEmailSignup () {
-    const email = this.state.email;
-    const password = this.state.password;
-    const responseDisplay = $('.response');
-    fetch(`${url}/users/signup?email=${email}&password=${password}`)
-      .then(response => {
-        if (response.ok) {
-          return response.json();
-        }
-        throw new Error('Request failed');
-      }, networkError => console.log(networkError))
-      .then(jsonResponse => {
-        responseDisplay.text(jsonResponse);
-      })
+    const {email, password} = this.state;
+    emailSignup(email, password);
   }
 
   handleEmailLogin () {
-    const email = this.state.email;
-    const password = this.state.password;
-    const responseDisplay = $('.response');
-    fetch(`${url}/users/login?email=${email}&password=${password}`)
-      .then(response => {
-        if (response.ok) {
-          return response.json();
-        }
-        throw new Error('Request faild.');
-      }, networkError => console.log(networkError))
-      .then(jsonResponse => {
-        responseDisplay.text(jsonResponse);
-      })
+    const {email, password} = this.state;
+    emailLogin(email, password);
   }
 
   handleGoogleSignup () {
-    googleSignup();
+    const google = googleSignup();
+    console.log(google.token);
+  }
+
+  handleFacebookSignup () {
+    facebookSignup()
+      .then(result => {
+        console.log(result.token);
+      })
   }
 
   render() {
@@ -62,14 +47,15 @@ class App extends Component {
         </input>
         <input
           className='password'
-          type='text'
+          type='password'
           value={this.state.password}
           onChange={event => this.setState({password: event.target.value})}>
         </input>
         <button onClick={this.handleEmailSignup}>Sign up</button>
         <button onClick={this.handleEmailLogin}>Log in</button>
         <button onClick={this.handleGoogleSignup}>Google</button>
-        <p className='response'></p>
+        <button onClick={this.handleFacebookSignup}>Facebook</button>
+        <p className='result'></p>
       </div>
     )
   }
