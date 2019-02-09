@@ -1,7 +1,7 @@
-import $ from 'jquery';
+import {url} from './config';
 import React, { Component } from 'react';
 import './App.css';
-const {emailSignup, emailLogin, googleSignup, facebookSignup, getFacebookResult} = require('./firebase/auth');
+const {emailSignup, emailLogin, googleSignup, facebookSignup} = require('./firebase/auth');
 
 class App extends Component {
   constructor(props) {
@@ -21,19 +21,34 @@ class App extends Component {
 
   handleEmailLogin () {
     const {email, password} = this.state;
-    emailLogin(email, password);
+    emailLogin(email, password)
+      .then(userCredential => {
+        const uid = userCredential.user.uid;
+        const provider = userCredential.user.providerData[0].providerId || userCredential.user.providerId;
+        console.log('This is the provider', provider);
+        console.log('This is the uid', uid);
+
+        const buildUrl = `${url}/users/emailSignup?email=${email}&password=${password}&uid=${uid}&provider=${provider}`;
+        fetch(buildUrl)
+          .then(result => {
+            if (result.ok) {
+              return result.json();
+            } else {
+              throw new Error('Request failed.');
+            }
+          }, networkError => console.log(networkError));
+      })
+      .then(jsonResponse => {
+        console.log(jsonResponse);
+      })
   }
 
   handleGoogleSignup () {
-    const google = googleSignup();
-    console.log(google.token);
+    googleSignup();
   }
 
   handleFacebookSignup () {
-    facebookSignup()
-      .then(result => {
-        console.log(result.token);
-      })
+    facebookSignup();
   }
 
   render() {

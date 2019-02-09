@@ -2,26 +2,36 @@ const {auth} = require('./firebase');
 const {googleProvider, facebookProvider} = require('./auth_providers');
 
 exports.emailSignup = (email, password) => {
-    auth.createUserWithEmailAndPassword(email, password)
-    .catch(error => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        return {
-            errorCode: errorCode,
-            errorMessage: errorMessage
-        }
+    return new Promise((resolve, reject) => {
+        auth.createUserWithEmailAndPassword(email, password)
+        .then(userCredential => {
+            resolve(userCredential);
+        })
+        .catch(error => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            reject({
+                errorCode: errorCode,
+                errorMessage: errorMessage
+            })
+        })
     })
 }
 
 exports.emailLogin = (email, password) => {
-    auth.signInWithEmailAndPassword(email, password)
-    .catch(error => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        return {
-            errorCode: errorCode,
-            errorMessage: errorMessage
-        }
+    return new Promise((resolve, reject) => {
+        auth.signInWithEmailAndPassword(email, password)
+        .then(userCredential => {
+            resolve(userCredential);
+        })
+        .catch(error => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            reject({
+                errorCode: errorCode,
+                errorMessage: errorMessage
+            })
+        })
     })
 }
 

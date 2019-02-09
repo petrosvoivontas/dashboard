@@ -18,61 +18,56 @@ firebase.auth().onAuthStateChanged(user => {
         const displayName = user.displayName;
         const email = user.email;
         const uid = user.uid;
-        console.log(user);
-        let provider;
-        if (user.email) {
-            console.log(email);
-            provider = 'email';
-            console.log(provider);
-        } else {
-            provider = 'google';
-        }
-
+        const provider = user.providerData[0].providerId || user.providerId;
+        // console.log(provider);
         let requestUrl;
 
-        if (provider === 'google') {
-            requestUrl = `${url}/users/googleSignup?displayName=${displayName}&uid=${uid}&provider=${provider}`
+        if (provider === 'google.com') {
+            requestUrl = `${url}/users/googleSignup?displayName=${displayName}&uid=${uid}&provider=${provider}`;
             fetch(requestUrl)
                 .then(result => {
                     if (result.ok) {
                         return result.json();
+                    } else {
+                        throw new Error('Request failed');
                     }
-                    throw new Error('Request failed');
                 }, networkError => console.log(networkError))
                 .then(jsonResponse => {
                     console.log('This is the json response', jsonResponse);
                 })
-        } else if (provider === 'email') {
+        } else if (provider === 'facebook.com') {
+            requestUrl = `${url}/users/facebookSignup?displayName=${displayName}&uid=${uid}&provider=${provider}`;
+            fetch(requestUrl)
+                .then(result => {
+                    if (result.ok) {
+                        return result.json();
+                    } else {
+                        return new Error ('Request failed.');
+                    }
+                }, networkError => console.log(networkError))
+                .then(jsonResponse => {
+                    console.log('This is the json repsonse', jsonResponse);
+                })
+        } else {
             requestUrl = `${url}/users/emailSignup?email=${email}&uid=${uid}&provider=${provider}`;
             fetch(requestUrl)
                 .then(result => {
                     if (result.ok) {
                         return result.json();
+                    } else {
+                        console.log(new Error('Request failed.'));
                     }
-                    throw new Error('Request failed');
-                }, networkError => console.log(networkError))
+                })
                 .then(jsonResponse => {
                     console.log('This is the json response', jsonResponse);
                 })
         }
 
-        if (user.emailVerified) {
-            if (provider === 'email') {
-                requestUrl = `${url}/users/verify?uid=${uid}`;
-                fetch(requestUrl)
-                    .then(result => {
-                        if (result.ok) {
-                            return result.json();
-                        } else {
-                            throw new Error('Request failed');
-                        }
-                    }, networkError => console.log(networkError))
-                    .then(jsonResponse => {
-                        console.log('This is the verification response', jsonResponse);
-                    })
+        if (!user.emailVerified) {
+            const actionCodeSettings = {
+                url: `${url}/users/verify?uid=${uid}`
             }
-        } else {
-            user.sendEmailVerification();
+            user.sendEmailVerification(actionCodeSettings);
         }
     }
 })
