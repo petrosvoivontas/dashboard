@@ -1,0 +1,26 @@
+.profilePage {
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+  margin: auto;
+}
+
+.profilePage input {
+  height: 20px;
+  border: 1px solid #98B1C4;
+  border-radius: 25px;
+  padding: 8px;
+  margin-bottom: 8px;
+}
+
+.profilePage input:nth-of-type(1) {
+  margin-top: 8px;
+}
+
+button {
+  margin-bottom: 8px;
+  width: 20%;
+  height: 40px;
+  border: 1px solid #98B1C4;
+  border-radius: 25px;
+}

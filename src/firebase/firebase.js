@@ -1,4 +1,4 @@
-const {url} = require('../config');
+const {localUrl, serverUrl} = require('../constants/config');
 const firebase = require('firebase');
 
 // Initialize Firebase
@@ -15,28 +15,34 @@ firebase.initializeApp(config);
 
 firebase.auth().onAuthStateChanged(user => {
     if (user) {
+        console.log(user);
         const displayName = user.displayName;
         const email = user.email;
         const uid = user.uid;
         const provider = user.providerData[0].providerId || user.providerId;
-        // console.log(provider);
+        console.log({
+            displayName: displayName,
+            email: email,
+            uid: uid,
+            provider: provider
+        })
         let requestUrl;
 
-        if (provider === 'google.com') {
-            requestUrl = `${url}/users/googleSignup?displayName=${displayName}&uid=${uid}&provider=${provider}`;
+        if (provider === 'google.com' && window.localStorage.getItem('signedUp') === 'false') {
+            requestUrl = `${serverUrl}/users/googleSignup?displayName=${displayName}&uid=${uid}&provider=${provider}`;
             fetch(requestUrl)
                 .then(result => {
                     if (result.ok) {
                         return result.json();
-                    } else {
-                        throw new Error('Request failed');
                     }
+                    throw new Error('Request failed');
                 }, networkError => console.log(networkError))
                 .then(jsonResponse => {
-                    console.log('This is the json response', jsonResponse);
+                    console.log(jsonResponse.message);
+                    window.localStorage.setItem('signedUp', true);
                 })
-        } else if (provider === 'facebook.com') {
-            requestUrl = `${url}/users/facebookSignup?displayName=${displayName}&uid=${uid}&provider=${provider}`;
+        } else if (provider === 'facebook.com' && window.localStorage.getItem('signedUp') === 'false') {
+            requestUrl = `${serverUrl}/users/facebookSignup?displayName=${displayName}&uid=${uid}&provider=${provider}`;
             fetch(requestUrl)
                 .then(result => {
                     if (result.ok) {
@@ -46,10 +52,11 @@ firebase.auth().onAuthStateChanged(user => {
                     }
                 }, networkError => console.log(networkError))
                 .then(jsonResponse => {
-                    console.log('This is the json repsonse', jsonResponse);
+                    console.log(jsonResponse);
+                    window.localStorage.setItem('signedUp', true);
                 })
-        } else {
-            requestUrl = `${url}/users/emailSignup?email=${email}&uid=${uid}&provider=${provider}`;
+        } else if (provider === 'password') {
+            requestUrl = `${serverUrl}/users/emailSignup?email=${email}&uid=${uid}&provider=${provider}`;
             fetch(requestUrl)
                 .then(result => {
                     if (result.ok) {
@@ -59,15 +66,15 @@ firebase.auth().onAuthStateChanged(user => {
                     }
                 })
                 .then(jsonResponse => {
-                    console.log('This is the json response', jsonResponse);
+                    console.log(jsonResponse.message);
                 })
-        }
 
-        if (!user.emailVerified) {
-            const actionCodeSettings = {
-                url: `${url}/users/verify?uid=${uid}`
+            if (user.emailVerified === false) {
+                const actionCodeSettings = {
+                    url: `${localUrl}/verify?uid=${uid}`
+                }
+                user.sendEmailVerification(actionCodeSettings);
             }
-            user.sendEmailVerification(actionCodeSettings);
         }
     }
 })

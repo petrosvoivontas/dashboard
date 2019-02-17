@@ -1,0 +1,34 @@
+.authButtons {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.authIcons {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 100px;
+}
+
+.facebookAuth {
+  width: 60px;
+  height: 60px;
+  margin-right: 8px;
+}
+
+.googleAuth {
+  width: 47px;
+  height: 47px;
+  margin-right: 8px;
+}
+
+.signupButton,
+.loginButton {
+  min-width: 120px;
+  max-width: 173px;
+  height: 45px;
+  border: 1px solid #98B1C4;
+  border-radius: 22px;
+  background-color: #98B1C4;
+}

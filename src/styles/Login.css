@@ -1,0 +1,18 @@
+.loginForm {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.loginForm input {
+  height: 20px;
+  border: 1px solid #98B1C4;
+  border-radius: 25px;
+  padding: 8px;
+  margin-bottom: 8px;
+}
+
+.loginForm input:nth-of-type(1) {
+  margin-top: 8px;
+}
